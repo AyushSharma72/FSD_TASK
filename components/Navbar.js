@@ -7,6 +7,7 @@ import { FaPlusCircle } from "react-icons/fa";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
     <div className="flex w-[90%] sm:w-3/4 lg:w-1/2  justify-between m-auto p-3 navbar  rounded">
@@ -24,7 +25,18 @@ const Navbar = () => {
           >
             Home
           </Link>
-          
+          {user ? null : (
+            <Link
+              href="/login"
+              className={
+                pathname === "/login"
+                  ? "text-black font-bold"
+                  : "font-bold hover:text-black"
+              }
+            >
+              login
+            </Link>
+          )}
           <Link href="/create">
             {" "}
             <div

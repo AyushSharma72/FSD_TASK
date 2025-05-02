@@ -6,14 +6,24 @@ import { createTaskAction } from "../actions";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import { GradientText } from "text-gradients";
-import { TextField, Button } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 
 const Create = () => {
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState(""); // Add state for priority
   const [loading, Setloading] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user ? user._id : null;
 
   const router = useRouter();
 
@@ -27,8 +37,9 @@ const Create = () => {
       formData.append("dueDate", dueDate);
       formData.append("description", description);
       formData.append("time", time);
+      formData.append("priority", priority); // Add priority to the formData
 
-      const result = await createTaskAction(formData);
+      const result = await createTaskAction(formData, userId);
 
       if (result.success) {
         toast.success(result.message);
@@ -36,6 +47,7 @@ const Create = () => {
         setDueDate("");
         setDescription("");
         setTime("");
+        setPriority(""); // Reset the priority
         router.push("/");
       } else {
         toast.error(result.message);
@@ -102,6 +114,21 @@ const Create = () => {
           }}
           className="text-black"
         />
+
+      
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Priority</InputLabel>
+          <Select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            label="Priority"
+          >
+            <MenuItem value="Low">Low</MenuItem>
+            <MenuItem value="Medium">Medium</MenuItem>
+            <MenuItem value="High">High</MenuItem>
+          </Select>
+        </FormControl>
+
         <Button
           variant="contained"
           color="primary"

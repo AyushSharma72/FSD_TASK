@@ -34,6 +34,16 @@ export default function Home() {
   const [loadingbackdrop, Setloadingbackdrop] = useState(false);
   const [deleteid, SetDeleteId] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
+  // const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+  const userId = user ? user._id : null;
 
   async function OpenModal(id) {
     Setloadingbackdrop(true);
@@ -62,7 +72,7 @@ export default function Home() {
 
   async function fetchData() {
     setLoading(true);
-    const response = await getTasksAction(page);
+    const response = await getTasksAction(page, userId);
 
     if (response.success) {
       setTasks(response.tasks);
