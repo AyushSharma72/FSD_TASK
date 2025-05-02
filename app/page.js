@@ -200,7 +200,7 @@ export default function Home() {
             <Select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="w-1/4 bg-white"
+              className="bg-white w-[300px] sm:w-[400px]"
             >
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Low">Low</MenuItem>
@@ -209,32 +209,32 @@ export default function Home() {
             </Select>
           </div>
 
-          <div className="h-[450px] w-[90%] sm:w-3/4 lg:w-1/2 flex flex-col items-center gap-y-6 overflow-auto">
+          <div className="h-[400px] w-[90%] sm:w-3/4 lg:w-1/2 flex flex-col items-center gap-y-6 overflow-auto">
             {filteredTasks.map((t) => (
               <div
                 key={t._id}
                 className="bg-slate-900 p-4 flex gap-4 rounded-lg w-full justify-between"
               >
                 {/* Task Details */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
                   <p className="text-lg text-white flex gap-2 items-center">
                     <span className="text-sm text-gray-400">Task Id:</span>
-                    {t._id}
+                    <span className="text-sm "> {t._id}</span>{" "}
                   </p>
                   <p className="text-lg text-white flex gap-2 items-center ">
                     <span className="text-sm text-gray-400">User id:</span>
-                    {user._id}
+                    <span className="text-sm "> {user._id}</span>
                   </p>
                   <p className="text-lg text-white flex gap-2 items-center ">
                     <span className="text-sm text-gray-400">task name:</span>
-                    {t.title}
+                    <span className="text-sm ">{t.title}</span> 
                   </p>
                   <p className="text-lg text-gray-300 flex gap-2 items-center">
                     <span className="text-sm text-gray-400">description:</span>
-                    {t.description}
+                    <span className="text-sm "> {t.description}</span>
                   </p>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-col sm:flex-row">
                     <div className="flex gap-2 items-center">
                       <span className="text-sm text-gray-400">Priority:</span>
                       {t.priority === "Low" ? (
