@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     if (data.success) {
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.plainUser));
 
       toast.success(data.message || "Login successful!", { id: loginToast });
 

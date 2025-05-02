@@ -34,8 +34,8 @@ export default function Home() {
   const [loadingbackdrop, Setloadingbackdrop] = useState(false);
   const [deleteid, SetDeleteId] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
-  // const user = JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(null);
+  const [priorityFilter, setPriorityFilter] = useState("All");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -43,7 +43,13 @@ export default function Home() {
       setUser(JSON.parse(storedUser));
     }
   }, []);
-  const userId = user ? user._id : null;
+
+  useEffect(() => {
+    if (user && user._id) {
+      fetchData(user._id);
+      getTasksCount();
+    }
+  }, [user, page]);
 
   async function OpenModal(id) {
     Setloadingbackdrop(true);
@@ -63,6 +69,14 @@ export default function Home() {
     }
   }
 
+  const filterTasksByPriority = (tasks, priority) => {
+    if (priority === "All") {
+      return tasks;
+    }
+    return tasks.filter((task) => task.priority === priority);
+  };
+  const filteredTasks = filterTasksByPriority(tasks, priorityFilter);
+
   function handleClose() {
     setOpen(false);
     setNewTitle("");
@@ -70,9 +84,13 @@ export default function Home() {
     setNewDueDate(null);
   }
 
-  async function fetchData() {
+  async function fetchData(userid) {
     setLoading(true);
-    const response = await getTasksAction(page, userId);
+    if (!userid) {
+      setLoading(false);
+      return;
+    }
+    const response = await getTasksAction(page, userid);
 
     if (response.success) {
       setTasks(response.tasks);
@@ -131,11 +149,6 @@ export default function Home() {
     }
   }
 
-  useEffect(() => {
-    fetchData();
-    getTasksCount();
-  }, [page]);
-
   const style = {
     position: "absolute",
     top: "50%",
@@ -148,6 +161,19 @@ export default function Home() {
     p: 4,
   };
 
+  if (!user) {
+    return (
+      <div className="flex justify-center">
+        <GradientText
+          color="bluepink"
+          direction="top left"
+          className="text-4xl font-extrabold text-center "
+        >
+          Please Login
+        </GradientText>
+      </div>
+    );
+  }
   return (
     <main>
       {loading ? (
@@ -163,44 +189,81 @@ export default function Home() {
         </div>
       ) : tasks?.length > 0 ? (
         <div className="flex justify-center flex-col items-center gap-y-6">
-          <GradientText
-            color="bluepink"
-            direction="top left"
-            className="text-4xl font-extrabold  mt-5"
-          >
-            Your Tasks
-          </GradientText>
-          <div className="h-[500px] w-[90%] sm:w-3/4 lg:w-1/2 flex flex-col items-center gap-y-6 overflow-auto">
-            {tasks.map((t) => (
+          <div className="flex flex-col justify-center items-center w-full gap-2 mt-4">
+            <GradientText
+              color="bluepink"
+              direction="top left"
+              className="text-4xl font-extrabold  mt-5"
+            >
+              Your Tasks
+            </GradientText>
+            <Select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="w-1/4 bg-white"
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+          </div>
+
+          <div className="h-[450px] w-[90%] sm:w-3/4 lg:w-1/2 flex flex-col items-center gap-y-6 overflow-auto">
+            {filteredTasks.map((t) => (
               <div
                 key={t._id}
                 className="bg-slate-900 p-4 flex gap-4 rounded-lg w-full justify-between"
               >
-                <div className="flex flex-col gap-4">
-                  <p className="text-lg font-semibold text-white flex gap-2">
-                    <span>Task:</span>
+                {/* Task Details */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-lg text-white flex gap-2 items-center">
+                    <span className="text-sm text-gray-400">Task Id:</span>
+                    {t._id}
+                  </p>
+                  <p className="text-lg text-white flex gap-2 items-center ">
+                    <span className="text-sm text-gray-400">User id:</span>
+                    {user._id}
+                  </p>
+                  <p className="text-lg text-white flex gap-2 items-center ">
+                    <span className="text-sm text-gray-400">task name:</span>
                     {t.title}
                   </p>
-                  <p className="text-lg text-gray-300 flex gap-2">
-                    <span className="font-medium ">Description:</span>
+                  <p className="text-lg text-gray-300 flex gap-2 items-center">
+                    <span className="text-sm text-gray-400">description:</span>
                     {t.description}
                   </p>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-sm text-gray-400">Due Date:</span>
-                    <Tag color="geekblue">
-                      {moment(t.dueDate).format("MMM DD, YYYY")}{" "}
-                      {moment(t.time, "HH:mm").format("hh:mm A")}
-                    </Tag>
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-sm text-gray-400">Status:</span>
-                    {t.status === "incomplete" ? (
-                      <Tag color="yellow">{t.status}</Tag>
-                    ) : (
-                      <Tag color="green">{t.status}</Tag>
-                    )}
+
+                  <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-gray-400">Priority:</span>
+                      {t.priority === "Low" ? (
+                        <Tag color="blue">{t.priority}</Tag>
+                      ) : t.priority === "Medium" ? (
+                        <Tag color="cyan">{t.priority}</Tag>
+                      ) : t.priority === "High" ? (
+                        <Tag color="red">{t.priority}</Tag>
+                      ) : null}
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-gray-400">Due Date:</span>
+                      <Tag color="geekblue">
+                        {moment(t.dueDate).format("MMM DD, YYYY")}{" "}
+                        {moment(t.time, "HH:mm").format("hh:mm A")}
+                      </Tag>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-gray-400">Status:</span>
+                      {t.status === "incomplete" ? (
+                        <Tag color="yellow">{t.status}</Tag>
+                      ) : (
+                        <Tag color="green">{t.status}</Tag>
+                      )}
+                    </div>
                   </div>
                 </div>
+                {/* Edit/Delete Icons */}
                 <div className="flex gap-1">
                   <FaEdit
                     className="cursor-pointer"
@@ -216,7 +279,6 @@ export default function Home() {
                     }}
                   />
                 </div>
-
                 {/* update modal  */}
                 <Modal
                   open={open}

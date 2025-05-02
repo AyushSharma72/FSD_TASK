@@ -149,22 +149,20 @@ export async function deleteTaskAction(id) {
   }
 }
 
-export async function getTasksAction(page = 1, limit = 4, userId) {
+export async function getTasksAction(page = 1, userid) {
   try {
-    await ConnectDb();
-
-   
-    limit = Number(limit);
-    if (isNaN(limit) || limit <= 0) {
-      limit = 4; 
+    console.log(userid)
+    if (!userid) {
+      return { success: false, message: "user id is not availiable" };
     }
 
-    const skipCount = (page - 1) * limit;
+    await ConnectDb();
 
-  
+    const skipCount = (page - 1) * 4;
+
     const tasks = await tasksmodal
-      .find({ userId })
-      .limit(limit)
+      .find({userId:userid })
+      .limit(4)
       .skip(skipCount)
       .lean();
 

@@ -20,7 +20,7 @@ const Create = () => {
   const [dueDate, setDueDate] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState(""); // Add state for priority
+  const [priority, setPriority] = useState("");
   const [loading, Setloading] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user._id : null;
@@ -37,7 +37,7 @@ const Create = () => {
       formData.append("dueDate", dueDate);
       formData.append("description", description);
       formData.append("time", time);
-      formData.append("priority", priority); // Add priority to the formData
+      formData.append("priority", priority);
 
       const result = await createTaskAction(formData, userId);
 
@@ -47,7 +47,7 @@ const Create = () => {
         setDueDate("");
         setDescription("");
         setTime("");
-        setPriority(""); // Reset the priority
+        setPriority("");
         router.push("/");
       } else {
         toast.error(result.message);
@@ -59,6 +59,19 @@ const Create = () => {
     }
   }
 
+ if (!user) {
+     return (
+       <div className="flex justify-center">
+         <GradientText
+           color="bluepink"
+           direction="top left"
+           className="text-4xl font-extrabold text-center "
+         >
+           Please Login
+         </GradientText>
+       </div>
+     );
+   }
   return (
     <main className="w-[90%] sm:w-3/4 lg:w-1/2  m-auto mt-10 flex items-center h-[450px] flex-col gap-2 ">
       <GradientText
@@ -115,7 +128,6 @@ const Create = () => {
           className="text-black"
         />
 
-      
         <FormControl fullWidth variant="outlined">
           <InputLabel>Priority</InputLabel>
           <Select
